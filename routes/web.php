@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Auth;
 //     return view('welcome');
 // });
 
+
 // messages
 
 Route::get('/messages', function () {

@@ -56,8 +56,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Example'),
+        'address' => env('MAIL_FROM_ADDRESS', 'mademeprogrammer3@gmail.com'),
+        'name' => env('MAIL_FROM_NAME', 'No Reply'),
     ],
 
     /*
@@ -121,3 +121,12 @@ return [
     ],
 
 ];
+
+
+// .env
+// MAIL_DRIVER=smtp
+// MAIL_HOST=smtp.mailtrap.io
+// MAIL_PORT=2525
+// MAIL_USERNAME=69833483c0e5a6
+// MAIL_PASSWORD=3c74131f28fd5b
+// MAIL_ENCRYPTION=null
