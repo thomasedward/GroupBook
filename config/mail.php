@@ -57,7 +57,7 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'mademeprogrammer3@gmail.com'),
-        'name' => env('MAIL_FROM_NAME', 'No Reply'),
+        'name' => env('MAIL_FROM_NAME', '(GroupBook) Reset Password'),
     ],
 
     /*

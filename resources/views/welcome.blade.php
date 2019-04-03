@@ -197,7 +197,7 @@
                           </div>
 
                     </div>
-      
+
 <!--  new design  -->
 
 <div class="flex-center position-ref full-height">
@@ -221,7 +221,7 @@
          News Feed</a>
        </li>
        <li>
-         <a href="{{url('/friends')}}"> <img src="{{ Request::root() }}/img/friends.png"
+         <a href="{{url('/Friends')}}"> <img src="{{ Request::root() }}/img/friends.png"
          width="32" style="margin:5px"  />
          Friends </a>
        </li>
@@ -231,7 +231,7 @@
         Messages</a>
        </li>
        <li>
-         <a href="{{url('/findFriends')}}"> <img src="{{ Request::root() }}/img/friends.png"
+         <a href="{{url('/FindFriends')}}"> <img src="{{ Request::root() }}/img/friends.png"
          width="32" style="margin:5px"  />
         Find Friends</a>
        </li>

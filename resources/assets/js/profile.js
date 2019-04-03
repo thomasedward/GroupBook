@@ -37,6 +37,14 @@ const app = new Vue({
     })
     .catch(error => {
       console.log(error)
+    }),
+    axios.get('http://127.0.0.1:8000/getMessages')
+    .then(response => {
+      console.log( response.data);
+      app.privsteMsgs = response.data;
+    })
+    .catch(error => {
+      console.log(error)
     })
   },
   methods:{

@@ -24,6 +24,7 @@ class ProfileController extends Controller
     public function updatePhoto(Request $request)
     {
        $file = $request->file('pic');
+       
        /* $fileName = $file->getClientOriginalName(); */
        $sha1 = sha1($file->getClientOriginalName());
        $extension = $file->getClientOriginalExtension();
@@ -282,31 +283,19 @@ public function sendNewMessage(Request $request){
     }
 }
 
-public function setToken(Request $request)
-{
-  $email = $request->email_address;
-  $checkEmail = DB::table('users')->where('email',$email)->get();
-  if (count($checkEmail) == 0) {
-    echo "no email ";
-  }
-  else {
-    $to = $email;
-    $subject = "Password Reset Link ";
-    $message = "
-    <a href=''>Link</a>
-    ";
-    // Always set content-type when sending HTML email
-    $headers = "MIME-Version: 1.0" . "\r\n";
-    $headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+public function jobs(){
+  $jobs = DB::table('users')
+  ->Join('jobs','users.id','jobs.company_id')
+  ->get();
+  return view('profile.jobs', compact('jobs'));
+}
 
-    // More headers
-    $headers .= 'From: <admin@groupbook.com>' . "\r\n";
-    
-
-    mail($to,$subject,$message,$headers);
-    echo "find email ";
-  }
-  // code...
+public function job($id){
+  $jobs = DB::table('users')
+  ->leftJoin('jobs','users.id','jobs.company_id')
+  ->where('jobs.id',$id)
+  ->get();
+  return view('profile.job', compact('jobs'));
 }
 
 // Notifications
