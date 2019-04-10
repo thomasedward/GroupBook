@@ -14,13 +14,16 @@ use Illuminate\Support\Facades\Auth;
 |
  */
 
-// Route::get('/', function () {
-//     return view('welcome');
+
+
+Route::get('/test', function () {
+    return 'hello';
+});
+
+
+// Route::get('/try', function () {
+//     return App\post::with('user','likes')->get();
 // });
-
-
-
-
 
 
 Auth::routes();
@@ -143,14 +146,33 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/', 'PostsController@index');
 
     Route::get('/posts', function(){
-      $posts = DB::table('posts')
-      ->leftJoin('users', 'posts.user_id', '=', 'users.id')
-      ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
+    //   $posts = DB::table('posts')
+    //   ->rightJoin('users', 'posts.user_id', '=', 'users.id')
+    //   ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
+    //
+    //   ->get();
+    //
+    // return $posts;
 
-      ->get();
-    return $posts;
+    return App\post::with('user','likes')->get();
+    });
+    Route::get('/', function(){
+    $posts =  App\post::all();
+      return view('welcome',compact('posts'));
     });
     Route::post('addPost', 'PostsController@addPost');
+   Route::get('deletePost/{id}', 'PostsController@deletePost');
+
+   //More options  like
+   Route::get('likePost/{id}', 'PostsController@likePost');
+   Route::get('/likes', function(){
+   return App\Like::all();
+   });
+   Route::get('/', function(){
+   $likes =  App\Like::all();
+     return view('welcome',compact('likes'));
+   });
+
     //  jobs
     //jobs for users
       Route::get('jobs', 'ProfileController@jobs');

@@ -44442,7 +44442,7 @@ Vue.component('example', __webpack_require__(37));
 var app = new Vue({
   el: '#app',
   data: {
-    message: ' ',
+    message: ' welcome in my website ',
     privsteMsgs: [],
     singleMsgs: [],
     msgFrom: '',
@@ -44453,6 +44453,11 @@ var app = new Vue({
   },
   created: function created() {
     axios.get('http://127.0.0.1:8000/getMessages').then(function (response) {
+      console.log(response.data);
+      app.privsteMsgs = response.data;
+    }).catch(function (error) {
+      console.log(error);
+    }), axios.get('http://127.0.0.1:8000/getMessages').then(function (response) {
       console.log(response.data);
       app.privsteMsgs = response.data;
     }).catch(function (error) {

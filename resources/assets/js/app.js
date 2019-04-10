@@ -22,17 +22,33 @@ const app = new Vue({
   data: {
     message: 'Hello Vue! by Thomas ',
     content: '',
-    posts:[]
+    posts:[],
+    likes:[],
   },
   created(){
+    //fetch posts
     axios.get('http://127.0.0.1:8000/posts')
     .then(response => {
       console.log('Save Successfull');
       this.posts = response.data;
+      Vue.filter('myOwnTime', function(value){
+        return moment(value).fromNow();
+      });
     })
     .catch(error => {
       console.log(error)
+    });
+
+    //fetch likse
+    axios.get('http://127.0.0.1:8000/likes')
+    .then(response => {
+      console.log('Save Successfull');
+      this.likes = response.data;
+
     })
+    .catch(error => {
+      console.log(error)
+    });
   },
   methods:{
     addPost(){
@@ -51,7 +67,36 @@ const app = new Vue({
       .catch(error => {
         console.log(error)
       })
+    },
+    DeletePost(id){
+      axios.get('http://127.0.0.1:8000/deletePost/' + id)
+      .then(response => {
+        console.log( response.data);
+        if( response.data == 'No Messages')
+        {
+          app.singleMsgs = [];
+
+        }
+        else {
+        app.posts = response.data;
+        }
+
+      })
+      .catch(error => {
+        console.log(error)
+      })
     }
+    ,
+    likePost(id){
+      axios.get('http://127.0.0.1:8000/likePost/' + id)
+      .then(response => {
+        console.log( response.data);
+        app.posts = response.data;
+      })
+      .catch(error => {
+        console.log(error)
+      })
+    },
   }
 
 

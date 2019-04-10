@@ -8,6 +8,8 @@
         <title>GroubBook</title>
 
         <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+        <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
+
         <script src="https://use.fontawesome.com/595a5020bd.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
 
@@ -189,7 +191,15 @@
                                   <a href="{{ url('/home') }}">Dashboard
                                 (<span style="text-transform:capitalize;
                                 color:green">{{ucwords(Auth::user()->name)}}</span>)</a>
-                                    <a href="{{ url('/logout') }}">Logout</a>
+                                <a href="{{ route('logout') }}"
+                                    onclick="event.preventDefault();
+                                             document.getElementById('logout-form').submit();">
+                                    Logout
+                                </a>
+
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                                    {{ csrf_field() }}
+                                </form>
                               @else
                                   <a href="{{ url('/login') }}">Login</a>
                                   <a href="{{ url('/register') }}">Register</a>
@@ -252,7 +262,7 @@
 
         <div class="posts_div">
            <div class="head_har">
-          <i class="fa fa-edit"></i> @{{msg}}
+          <i class="fa fa-edit"></i>
             </div>
 
             <div style="background-color:#fff; padding:10px">
@@ -308,7 +318,7 @@
                 <div class="col-md-12 all_posts">
 
                     <div class="col-md-1 pull-left">
-                      <img :src="'{{ Request::root() }}/user_images/' + post.pic"
+                      <img :src="'{{ Request::root() }}/user_images/' + post.user.pic"
                       style="width:50px; border-radius:100%">
                     </div>
 
@@ -317,10 +327,30 @@
                 <div class="row">
                  <div class="col-md-11">
 
-                   <p><a :href="'{{url('profile')}}/' +  post.slug" class="user_name"> @{{post.name}}</a> <br>
+                   <p><a :href="'{{url('profile')}}/' +  post.user.slug" class="user_name"> @{{post.user.name}}</a> <br>
                    <span style="color:#AAADB3">  @{{ post.created_at | myOwnTime}}
                    <i class="fa fa-globe"></i></span></p>
                  </div>
+                 <div class="col-md-1 pull-right">
+
+            <!-- delete button goes here -->
+    <a href="#" data-toggle="dropdown"><i class="fa fa-cog"></i>
+</a>
+    <div class="dropdown-menu">
+      <li> <a href="">something</a> </li>
+      <li> <a href="">something</a> </li>
+      <div class="dropdown-divider">
+      </div>
+      <li v-if="post.user_id == '{{Auth::user()->id}}'">
+
+         <a href="#" @click="DeletePost(post.post_id)"> <i class="fa fa-trash"></i>  Delete</a>
+       </li>
+
+    </div>
+
+
+         </div>
+
 
                 </div>
                     </div>
@@ -331,6 +361,36 @@
 
                      </p>
 
+                     <div style="padding:10px; border-top:1px solid #ddd" class="col-md-12">
+                       <div class="col-md-4">
+
+
+                         <p v-if="post.likes.length >0">
+                         liked by <b style="color:green"> @{{post.likes.length}} </b> persons
+                         </p>
+                         <div v-for='like in post.likes'>
+
+                         </div>
+
+                         <p v-else>
+                           <i class="fa fa-thumbs-up likeBtn" @click="likePost(post.post_id)">Like</i>
+                         </p>
+
+
+                       </div>
+                         <div class="col-md-4">
+
+
+                             <p>
+                               comment
+                             </p>
+
+
+                         </div>
+
+
+
+                       </div>
 
                   </div>
 

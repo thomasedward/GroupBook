@@ -116,6 +116,10 @@ sendNewMsg(){
          console.log(error); // run if we have error
        });
 }
+,
+
+
+
   }
 
 

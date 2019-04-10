@@ -44442,14 +44442,27 @@ var app = new Vue({
   data: {
     message: 'Hello Vue! by Thomas ',
     content: '',
-    posts: []
+    posts: [],
+    likes: []
   },
   created: function created() {
     var _this = this;
 
+    //fetch posts
     axios.get('http://127.0.0.1:8000/posts').then(function (response) {
       console.log('Save Successfull');
       _this.posts = response.data;
+      Vue.filter('myOwnTime', function (value) {
+        return moment(value).fromNow();
+      });
+    }).catch(function (error) {
+      console.log(error);
+    });
+
+    //fetch likse
+    axios.get('http://127.0.0.1:8000/likes').then(function (response) {
+      console.log('Save Successfull');
+      _this.likes = response.data;
     }).catch(function (error) {
       console.log(error);
     });
@@ -44468,6 +44481,26 @@ var app = new Vue({
           _this2.content = '';
           app.posts = response.data;
         }
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    DeletePost: function DeletePost(id) {
+      axios.get('http://127.0.0.1:8000/deletePost/' + id).then(function (response) {
+        console.log(response.data);
+        if (response.data == 'No Messages') {
+          app.singleMsgs = [];
+        } else {
+          app.posts = response.data;
+        }
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    likePost: function likePost(id) {
+      axios.get('http://127.0.0.1:8000/likePost/' + id).then(function (response) {
+        console.log(response.data);
+        app.posts = response.data;
       }).catch(function (error) {
         console.log(error);
       });
