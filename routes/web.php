@@ -1,4 +1,7 @@
 <?php
+
+use App\post;
+use App\User;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
@@ -17,12 +20,14 @@ use Illuminate\Support\Facades\Auth;
 
 
 Route::get('/test', function () {
-    return 'hello';
+
+    return App\User::isRole() ;
+
 });
 
 
 // Route::get('/try', function () {
-//     return App\post::with('user','likes')->get();
+//     return App\post::with('user','likes','comments)->get();
 // });
 
 
@@ -63,40 +68,52 @@ Route::group(['middleware' => 'auth'], function () {
     return array_merge($AllUsers1->toArray(),$AllUsers2->toArray()) ;
     });
     Route::get('/getMessages/{id}', function($id){
-    $CheckConOne = DB::table('conversations')
-                    ->where('user_one', '=', Auth::user()->id)
-                    ->where('user_two', '=', $id)
-                    ->get();
-    $CheckConTwo = DB::table('conversations')
-                                    ->where('user_one', '=', $id)
-                                    ->where('user_two', '=',Auth::user()->id )
-                                    ->get();
-    if((count($CheckConOne) != 0) || (count($CheckConTwo) != 0))
-    {
-      // fetch message
-    //echo $CheckCon[0]->id;
-    if((count($CheckConOne) != 0))
-    {
-      $userMsgs = DB::table('messages')
-                      ->join('users','users.id','messages.user_from')
-                      ->where('messages.conversation_id', '=', $CheckConOne[0]->id)
-                      ->orderBy('messages.id')->get();
-      return $userMsgs;
 
-    }
-    elseif((count($CheckConTwo) != 0))
-    {
-      $userMsgs = DB::table('messages')
-      ->join('users','users.id','messages.user_from')
-      ->where('messages.conversation_id', '=', $CheckConTwo[0]->id)
-      ->orderBy('messages.id')->get();
-      return $userMsgs;
+        //update cov status
+        $update_status = DB::table('conversations')->where('con_id',$id)
+            ->update([
+                'con_status' => 1 // now read by user
+            ]);
 
-    }
-    }
-    else {
-      echo "No Messages";
-    }
+        $userMsg = DB::table('messages')
+            ->join('users', 'users.id','messages.user_from')
+            ->where('messages.conversation_id', $id)->get();
+        return $userMsg;
+
+//    $CheckConOne = DB::table('conversations')
+//                    ->where('user_one', '=', Auth::user()->id)
+//                    ->where('user_two', '=', $id)
+//                    ->get();
+//    $CheckConTwo = DB::table('conversations')
+//                                    ->where('user_one', '=', $id)
+//                                    ->where('user_two', '=',Auth::user()->id )
+//                                    ->get();
+//    if((count($CheckConOne) != 0) || (count($CheckConTwo) != 0))
+//    {
+//      // fetch message
+//    //echo $CheckCon[0]->id;
+//    if((count($CheckConOne) != 0))
+//    {
+//      $userMsgs = DB::table('messages')
+//                      ->join('users','users.id','messages.user_from')
+//                      ->where('messages.conversation_id', '=', $CheckConOne[0]->id)
+//                      ->orderBy('messages.id')->get();
+//      return $userMsgs;
+//
+//    }
+//    elseif((count($CheckConTwo) != 0))
+//    {
+//      $userMsgs = DB::table('messages')
+//      ->join('users','users.id','messages.user_from')
+//      ->where('messages.conversation_id', '=', $CheckConTwo[0]->id)
+//      ->orderBy('messages.id')->get();
+//      return $userMsgs;
+//
+//    }
+//    }
+//    else {
+//      echo "No Messages";
+//    }
     });
     Route::post('/sendMessage', 'ProfileController@sendMessage');
     Route::get('/newMessage','ProfileController@newMessage');
@@ -142,6 +159,17 @@ Route::group(['middleware' => 'auth'], function () {
 
        }
     });
+
+    // fetch All user
+    Route::get('/Allusers', function(){
+
+       // dd('here');
+     $Allusers =   DB::table('users')
+            ->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')
+            ->get();
+     return $Allusers;
+    });
+
     // posts
     Route::get('/', 'PostsController@index');
 
@@ -154,14 +182,28 @@ Route::group(['middleware' => 'auth'], function () {
     //
     // return $posts;
 
-    return App\post::with('user','likes')->get();
+    return App\post::with('user','likes','comments')->get();
+    });
+
+
+    Route::get('/post/{id}', function($id){
+
+        $post =  App\post::where('post_id',$id)->get();
+        return $post[0]->content;
+
     });
     Route::get('/', function(){
     $posts =  App\post::all();
       return view('welcome',compact('posts'));
     });
     Route::post('addPost', 'PostsController@addPost');
-   Route::get('deletePost/{id}', 'PostsController@deletePost');
+    Route::get('deletePost/{id}', 'PostsController@deletePost');
+    Route::post('updatePost', 'PostsController@updatePost');
+
+   // upload Image
+    Route::post('/uploadImg', 'PostsController@uploadImg');
+
+
 
    //More options  like
    Route::get('likePost/{id}', 'PostsController@likePost');
@@ -173,11 +215,14 @@ Route::group(['middleware' => 'auth'], function () {
      return view('welcome',compact('likes'));
    });
 
+    //More options  comment
+    Route::post('addComment', 'PostsController@addComment');
     //  jobs
     //jobs for users
       Route::get('jobs', 'ProfileController@jobs');
       Route::get('job/{id}','ProfileController@job');
-
+     //search
+    Route::post('search', 'PostsController@search');
 
 });
 Route::group(['prefix' => 'company','middleware' => ['auth','company']], function () {

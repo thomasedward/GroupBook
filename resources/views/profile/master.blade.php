@@ -59,7 +59,18 @@
                             <li><a href="{{ route('register') }}">Register</a></li>
                         @else
 
-                        <li> <a href="{{ url ('/messages')}}">   <i class="fa fa-envelope" aria-hidden="true"></i>  </a> </li>
+                        <li> <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">      <span class="label label-info" style="    position: relative;
+    top: -15px;
+    right: -30px;">
+                              @include('profile.unread')
+                              </span>   <i class="fa fa-envelope" aria-hidden="true" style="font-size: 20px;"></i>  </a>
+
+
+                            <ul class="dropdown-menu" role="menu" style="width:400px;">
+                              <li> message 1 </li>
+                            </ul>
+
+                        </li>
                         <li> <a href="{{ url ('/Friends')}}">   <i class="fa  fa-users"></i>  </a> </li>
                         <li class="dropdown">
 

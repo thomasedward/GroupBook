@@ -55,7 +55,7 @@ class ProfileController extends Controller
       $allusers = DB::table('users')->leftJoin('profiles', 'users.id', '=', 'profiles.user_id')->where('users.id' ,'!=',$uid)->get();
 
 
-        return view('profile.FindFriends',compact('allusers'));
+        return view('profile.Findfriends',compact('allusers'));
     }
     public function addFriend($user_id)
     {
@@ -214,6 +214,10 @@ $fetch_userTo = DB::table('messages')->where('conversation_id', $conID)
     $userMsg = DB::table('messages')
     ->join('users', 'users.id','messages.user_from')
     ->where('messages.conversation_id', $conID)->orderBy('messages.id')->get();
+      $update_status = DB::table('conversations')->where('con_id',$conID)
+          ->update([
+              'con_status' => 0 // now read by user
+          ]);
     return $userMsg;
   }
     // code...

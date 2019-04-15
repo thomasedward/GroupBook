@@ -153,13 +153,22 @@
 
 <ul v-for="privsteMsg in privsteMsgs" >
 
-<li @click="messages(privsteMsg.id)"
+<li v-if="privsteMsg.con_status == 0" @click="messages(privsteMsg.con_id)"
     style="list-style:none; margin-top:10px;
            background-color:#ddd;">
 <img :src="'{{ Request::root() }}/user_images/' + privsteMsg.pic"
 width="32" style="margin:5px"  /> @{{privsteMsg.name}}
 <p> message will dispaly </p>
 </li>
+
+    <li v-else @click="messages(privsteMsg.con_id)"
+        style="list-style:none; margin-top:10px;
+           background-color:#fff;">
+        <img :src="'{{ Request::root() }}/user_images/' + privsteMsg.pic"
+             width="32" style="margin:5px"  /> @{{privsteMsg.name}}
+        <p> message will dispaly </p>
+    </li>
+
 
 </ul>
 

@@ -44449,15 +44449,16 @@ var app = new Vue({
     conID: '',
     friend_id: '',
     seen: false,
-    newMsgFrom: ''
+    newMsgFrom: '',
+    bUrl: 'http://127.0.0.1:8000'
   },
   created: function created() {
-    axios.get('http://127.0.0.1:8000/getMessages').then(function (response) {
+    axios.get(this.bUrl + '/getMessages').then(function (response) {
       console.log(response.data);
       app.privsteMsgs = response.data;
     }).catch(function (error) {
       console.log(error);
-    }), axios.get('http://127.0.0.1:8000/getMessages').then(function (response) {
+    }), axios.get(this.bUrl + '/getMessages').then(function (response) {
       console.log(response.data);
       app.privsteMsgs = response.data;
     }).catch(function (error) {
@@ -44467,7 +44468,7 @@ var app = new Vue({
 
   methods: {
     messages: function messages(id) {
-      axios.get('http://127.0.0.1:8000/getMessages/' + id).then(function (response) {
+      axios.get(this.bUrl + '/getMessages/' + id).then(function (response) {
         console.log(response.data);
         if (response.data == 'No Messages') {
           app.singleMsgs = [];
@@ -44487,7 +44488,7 @@ var app = new Vue({
     },
     sendMsg: function sendMsg() {
       if (this.msgFrom) {
-        axios.post('http://127.0.0.1:8000/sendMessage', {
+        axios.post(this.bUrl + '/sendMessage', {
           conID: this.conID,
           msg: this.msgFrom
         }).then(function (response) {
@@ -44507,13 +44508,13 @@ var app = new Vue({
       app.friend_id = id;
     },
     sendNewMsg: function sendNewMsg() {
-      axios.post('http://127.0.0.1:8000/sendNewMessage', {
+      axios.post(this.bUrl + '/sendNewMessage', {
         friend_id: this.friend_id,
         msg: this.newMsgFrom
       }).then(function (response) {
         console.log(response.data); // show if success
         if (response.status === 200) {
-          window.location.replace('http://127.0.0.1:8000/messages');
+          window.location.replace(this.bUrl + '/messages');
           app.message = 'your message has been sent successfully';
         }
       }).catch(function (error) {

@@ -44440,16 +44440,26 @@ Vue.component('example', __webpack_require__(37));
 var app = new Vue({
   el: '#app',
   data: {
+    imageupload: '',
     message: 'Hello Vue! by Thomas ',
     content: '',
+    updatedContent: '',
+    contentcomment: {},
     posts: [],
-    likes: []
+    likes: [],
+    Allusers: [],
+    results: [],
+    commentSeen: false,
+    bUrl: 'http://127.0.0.1:8000',
+    myObject: null,
+    qry: ''
+
   },
   created: function created() {
     var _this = this;
 
     //fetch posts
-    axios.get('http://127.0.0.1:8000/posts').then(function (response) {
+    axios.get(this.bUrl + '/posts').then(function (response) {
       console.log('Save Successfull');
       _this.posts = response.data;
       Vue.filter('myOwnTime', function (value) {
@@ -44460,9 +44470,17 @@ var app = new Vue({
     });
 
     //fetch likse
-    axios.get('http://127.0.0.1:8000/likes').then(function (response) {
+    axios.get(this.bUrl + '/likes').then(function (response) {
       console.log('Save Successfull');
       _this.likes = response.data;
+    }).catch(function (error) {
+      console.log(error);
+    });
+
+    //fetch all user
+    axios.get(this.bUrl + '/Allusers').then(function (response) {
+      console.log('Save Successfull');
+      _this.Allusers = response.data;
     }).catch(function (error) {
       console.log(error);
     });
@@ -44472,7 +44490,7 @@ var app = new Vue({
     addPost: function addPost() {
       var _this2 = this;
 
-      axios.post('http://127.0.0.1:8000/addPost', {
+      axios.post(this.bUrl + '/addPost', {
         content: this.content
       }).then(function (response) {
         console.log('Save Successfull');
@@ -44486,7 +44504,7 @@ var app = new Vue({
       });
     },
     DeletePost: function DeletePost(id) {
-      axios.get('http://127.0.0.1:8000/deletePost/' + id).then(function (response) {
+      axios.get(this.bUrl + '/deletePost/' + id).then(function (response) {
         console.log(response.data);
         if (response.data == 'No Messages') {
           app.singleMsgs = [];
@@ -44497,10 +44515,107 @@ var app = new Vue({
         console.log(error);
       });
     },
+    openModal: function openModal(post_id) {
+      axios.get(this.bUrl + '/post/' + post_id).then(function (response) {
+        console.log(response.data);
+        if (response.data === 'done') {
+          app.updatedContent = '';
+        } else {
+          app.updatedContent = response.data;
+        }
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    updatePost: function updatePost(post_id) {
+
+      axios.post(this.bUrl + '/updatePost', {
+        updatedContent: this.updatedContent,
+        post_id: post_id
+      }).then(function (response) {
+        console.log('Save Successfull');
+
+        if (response.status === 200) {
+          app.posts = response.data;
+        }
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
     likePost: function likePost(id) {
-      axios.get('http://127.0.0.1:8000/likePost/' + id).then(function (response) {
+      axios.get(this.bUrl + '/likePost/' + id).then(function (response) {
         console.log(response.data);
         app.posts = response.data;
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    addComment: function addComment(post, key) {
+      var _this3 = this;
+
+      axios.post(this.bUrl + '/addComment', {
+        contentcomment: this.contentcomment[key],
+        post_id: post.post_id
+      }).then(function (response) {
+        console.log('Save Successfull');
+
+        if (response.status === 200) {
+          _this3.contentcomment = '';
+        }
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    onFileChange: function onFileChange(e) {
+      var files = e.target.files || e.dataTransfer.files;
+      this.createImg(files[0]); // files the image/ file value to our function
+      console.log('onfile');
+    },
+    createImg: function createImg(file) {
+      var _this4 = this;
+
+      // we will preview our image before upload
+      var imageupload = new Image();
+      var reader = new FileReader();
+      console.log('1create');
+
+      reader.onload = function (e) {
+        _this4.imageupload = e.target.result;
+        console.log('2create');
+      };
+      reader.readAsDataURL(file);
+    },
+    uploadImg: function uploadImg() {
+      var _this5 = this;
+
+      axios.post(this.bUrl + '/uploadImg', {
+        imageupload: this.imageupload,
+        content: this.content
+      }).then(function (response) {
+        console.log('Save Successfull');
+        _this5.imageupload = "";
+        _this5.content = "";
+        if (response.status === 200) {
+          _this5.imageupload = "";
+          _this5.content = "";
+          console.log('Save now');
+        }
+      }).catch(function (error) {
+        console.log(error);
+      });
+    },
+    removeImg: function removeImg() {
+      this.imageupload = '';
+    },
+    autoComplete: function autoComplete() {
+      this.results = [];
+      axios.post(this.bUrl + '/search', {
+        qry: this.qry
+      }).then(function (response) {
+        console.log('Save Successfull');
+        if (response.status === 200) {
+          app.results = response.data;
+        }
       }).catch(function (error) {
         console.log(error);
       });

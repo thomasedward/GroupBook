@@ -27,10 +27,11 @@ const app = new Vue({
     conID:'',
     friend_id: '',
     seen: false,
-    newMsgFrom: ''
+    newMsgFrom: '',
+    bUrl: 'http://127.0.0.1:8000',
   },
   created(){
-    axios.get('http://127.0.0.1:8000/getMessages')
+    axios.get( this.bUrl + '/getMessages')
     .then(response => {
       console.log( response.data);
       app.privsteMsgs = response.data;
@@ -38,7 +39,7 @@ const app = new Vue({
     .catch(error => {
       console.log(error)
     }),
-    axios.get('http://127.0.0.1:8000/getMessages')
+    axios.get(this.bUrl + '/getMessages')
     .then(response => {
       console.log( response.data);
       app.privsteMsgs = response.data;
@@ -49,7 +50,7 @@ const app = new Vue({
   },
   methods:{
     messages:function(id){
-      axios.get('http://127.0.0.1:8000/getMessages/' + id)
+      axios.get(this.bUrl + '/getMessages/' + id)
       .then(response => {
         console.log( response.data);
         if( response.data == 'No Messages')
@@ -75,7 +76,7 @@ const app = new Vue({
 },
 sendMsg(){
   if(this.msgFrom){
-    axios.post('http://127.0.0.1:8000/sendMessage', {
+    axios.post(this.bUrl + '/sendMessage', {
            conID: this.conID,
            msg: this.msgFrom
          })
@@ -100,14 +101,14 @@ friendID: function(id){
 
 },
 sendNewMsg(){
-  axios.post('http://127.0.0.1:8000/sendNewMessage', {
+  axios.post(this.bUrl + '/sendNewMessage', {
          friend_id: this.friend_id,
          msg: this.newMsgFrom,
        })
        .then(function (response) {
          console.log(response.data); // show if success
          if(response.status===200){
-           window.location.replace('http://127.0.0.1:8000/messages');
+           window.location.replace(this.bUrl + '/messages');
            app.message = 'your message has been sent successfully';
          }
 

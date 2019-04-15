@@ -128,6 +128,33 @@
                   left:calc(25%);
                   overflow-y: scroll;
                 }
+                .remove-img
+                {
+                    position: absolute;
+                    /* top: 150px; */
+                    top: 0px;
+                    right: 65px;
+                    font-size: 20px;
+                    font-weight: bold;
+                    color: #d9d9d9;
+                    cursor: pointer;
+                }
+            .remove-img:hover
+            {
+
+                color: #fff;
+                cursor: pointer;
+            }
+
+            #part_image img:hover   {
+
+                opacity: 0.5;
+                filter: alpha(opacity=50); /* For IE8 and earlier */
+            }
+            #part_image img:hover ~ .remove-img  {
+                color: #fff;
+                cursor: pointer;
+            }
                 @media (min-width: 268px) and (max-width: 768px) {
 
                   .center-con{
@@ -169,10 +196,10 @@
 
                 <div class="top_bar" >
 
-                      <!-- <div class="top-left links" style="float:left">
+                       <div class="top-left links" style="float:left">
                         <input type="text" class="form-control"
                         placeholder="what are you looking for?"
-                        v-model="qry" v-on:Keyup="autoComplete"/>
+                        v-model="qry" v-on:keyup.enter="autoComplete"/>
                         <div class="panel-footer" v-if="results.length"
                         style="position:relative; z-index:1000; border:1px solid #ccc;
                         background:#fff;">
@@ -182,8 +209,7 @@
                             </a>
                           </p>
                         </div>
-                      </div> -->
-
+                      </div>
                           <div class="top-right links" style="float:right">
                               @if (Auth::check())
                               <!-- <a href="{{url('jobs')}}" style="background-color:#283E4A;
@@ -276,34 +302,36 @@
                   <form method="post" enctype="multipart/form-data" v-on:submit.prevent="addPost">
                   <textarea v-model="content" id="postText" class="form-control"
                   placeholder="what's on your mind ?"></textarea>
+                      <div v-if="!imageupload" >
                   <button type="submit" class="btn btn-sm btn-primary
                    pull-right" style="margin:10px; padding:5 15 5 15; background-color:#4267b2" id="postBtn">Post</button>
+                      </div>
                   </form>
-                  </div>
 
-                 <!-- <div v-if="!image" style="position:relative;display:inline-block">
-                 <div style="border:1px solid #ddd; border-radius:10px;
-                 background-color:#efefef; padding:3 15 3 10; margin-bottom:10px">
-                 <i class="fa fa-file-image-o"></i> <b>photo</b>
-                  <input type="file" @change="onFileChange" style="position:absolute;
+                    <div v-if="!imageupload" style="position:relative;display:inline-block">
+                        <div style="border:1px solid #ddd; border-radius:10px;
+                 background-color:#efefef; padding:3px 15px 3px 10px; margin-bottom:10px;">
+                            <i class="fa fa-file-image-o"></i> <b>photo</b>
+                            <input type="file" @change="onFileChange" style="position:absolute;
                   left:0;top:0; opacity:0"/>
+                        </div>
+                    </div>
+
+                    <div id="part_image" style="position: relative;" v-else >
+
+                    <img :src='imageupload'
+                         class="img-rounded"
+                         alt="Image Post"
+                         style="display: block;
+                                width: 400px;
+                                margin: 10px 0px;"/>
+
+                        <button @click="uploadImg" class="btn btn-default"> <i class="fa fa-upload" aria-hidden="true"></i>
+                            Post </button>
+                        <span @click="removeImg" class="remove-img"> X </span>
+                    </div>
                   </div>
-                  </div>  -->
 
-                  <!-- <div v-else>
-
-                <div class="upload_wrap">
-                    <textarea v-model="content" id="postText" class="form-control"
-                    placeholder="what's on your mind ?"></textarea>
-                      <b @click="removeImg" style="right:0;position:absolute;cursor:pointer">Cancel</b>
-                  <img :src="image" style="width:100px; margin:10px;"/><br>
-
-              </div>
-
-                  <button @click="uploadImg" class="btn btn-sm btn-info pull-right" style="margin:10px">Post</button>
-
-
-                  </div> -->
 
                 </div>
               </div>
@@ -313,7 +341,7 @@
             <div>
                <!--<div class="head_har">  Posts</div> -->
 
-               <div v-for="post in posts" >
+               <div v-for="post,key in posts" >
 
                 <div class="col-md-12 all_posts">
 
@@ -328,6 +356,7 @@
                  <div class="col-md-11">
 
                    <p><a :href="'{{url('profile')}}/' +  post.user.slug" class="user_name"> @{{post.user.name}}</a> <br>
+                       @{{key}}
                    <span style="color:#AAADB3">  @{{ post.created_at | myOwnTime}}
                    <i class="fa fa-globe"></i></span></p>
                  </div>
@@ -337,8 +366,10 @@
     <a href="#" data-toggle="dropdown"><i class="fa fa-cog"></i>
 </a>
     <div class="dropdown-menu">
-      <li> <a href="">something</a> </li>
-      <li> <a href="">something</a> </li>
+        <li v-if="post.user_id == '{{Auth::user()->id}}'">
+            <a data-toggle="modal" :data-target="'#myModal' + post.post_id"
+               @click="openModal(post.post_id)">Edit</a></li>
+
       <div class="dropdown-divider">
       </div>
       <li v-if="post.user_id == '{{Auth::user()->id}}'">
@@ -349,16 +380,56 @@
     </div>
 
 
-         </div>
+                     <!-- Modal -->
+                     <div class="modal fade" :id="'myModal'+ post.post_id" role="dialog">
+                         <div class="modal-dialog">
+
+                             <!-- Modal content-->
+                             <div class="modal-content">
+                                 <div class="modal-header">
+                                     <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                     <h4 class="modal-title">Edit Post</h4>
+                                 </div>
+                                 <div class="modal-body">
+                             <textarea v-model="updatedContent"
+                                       class="form-control">@{{post.content}}</textarea>
+                                 </div>
+                                 <div class="modal-footer">
+                                     <button type="button" class="btn btn-default"
+                                             data-dismiss="modal">Close</button>
+
+                                     <button type="button" class="btn btn-success"
+                                             data-dismiss="modal"
+                                             @click="updatePost(post.post_id)">Save Changes</button>
+                                 </div>
+                             </div>
+
+                         </div>
+                     </div>
+                     <!-- Modal -->
+
+
+                 </div>
 
 
                 </div>
                     </div>
 
-                     <p class="col-md-12" style="color:#000; margin-top:15px; font-family:inherit">
-                       @{{post.content}}
-                       <br>
+                     <p v-if="post.content != 'done'" class="col-md-12" style="color:#000; margin-top:15px; font-family:inherit">
 
+
+                       @{{post.content}}
+
+                       <br>
+                         <div v-if="post.post_image !== null">
+                         <img :src="'{{ Request::root() }}/posts_images/' + post.post_image"
+                              class="img-rounded"
+                              alt="Image Post"
+                              style="display: block;
+                                width: 510px;
+                                margin: 10px 0px;
+                                    padding: 10px;" >
+                    </div>
                      </p>
 
                      <div style="padding:10px; border-top:1px solid #ddd" class="col-md-12">
@@ -368,9 +439,6 @@
                          <p v-if="post.likes.length >0">
                          liked by <b style="color:green"> @{{post.likes.length}} </b> persons
                          </p>
-                         <div v-for='like in post.likes'>
-
-                         </div>
 
                          <p v-else>
                            <i class="fa fa-thumbs-up likeBtn" @click="likePost(post.post_id)">Like</i>
@@ -381,19 +449,68 @@
                          <div class="col-md-4">
 
 
-                             <p>
-                               comment
+                             <p id="showComment" @click="commentSeen=!commentSeen">
+                               comment <span v-if="post.comments.length >0 ">
+                                 <span class="badge">@{{post.comments.length}}</span>
+                             </span>
+                                 <span v-else>
+
+                                 </span>
                              </p>
 
 
                          </div>
 
 
-
                        </div>
+
+
 
                   </div>
 
+
+                   <div id="commentBox" v-if="commentSeen">
+                       <div class="comment_form">
+                           <textarea class="form=control" v-model="contentcomment[key]" name="" id="" cols="80" rows="2"></textarea>
+                           <button class="btn btn-success" @click="addComment(post,key)">Send</button>
+
+                       </div>
+
+                       <ul v-for='comment in post.comments'>
+                           <li >
+
+                               <div class="well">
+                                   <div class="media">
+                                         <span v-for="user in Allusers">
+                               <span  v-if="comment.user_com_id == user.id" >
+                                       <a class="pull-left" :href="'{{url('/profile/')}}/' + user.slug">
+
+                                           <img class="media-object" :src="'{{ Request::root() }}/user_images/' + user.pic"
+                                                style="width: 50px;
+
+border-radius: 20%;
+
+margin: 5px;
+
+height: 50px;">
+
+
+                                       </a>
+                                    <span class="text-left">@{{ user.name }}</span>
+                                       <div class="media-body">
+
+                                            </span> </span>
+                                           <p>@{{ comment.comment  }}.</p>
+                                       <span class="badge pull-right" > <i class="fa fa-calendar" aria-hidden="true"></i>
+ @{{ comment.created_at | myOwnTime}} </span>
+
+                                       </div>
+                                   </div>
+                               </div>
+
+                               </li>
+                       </ul>
+                   </div>
 
 
 
@@ -406,7 +523,17 @@
     <!-- right side start -->
     <div class="col-md-3 right-sidebar hidden-sm hidden-xs" style="position:fixed; right:10px">
         <h3 align="center">Right Sidebar</h3>
+        @if(Auth::check())
+            @foreach(App\User::all() as $user)
+                @if($user->isOnline())
 
+                  <li style="color: green"> online :  {{$user->name}}</li>
+                @else
+
+                    <li > offline :   {{$user->name}}</li>
+                @endif
+            @endforeach
+        @endif
 
     </div>
     <!-- right side end -->

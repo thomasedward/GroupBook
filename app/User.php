@@ -4,6 +4,7 @@ namespace App;
 use App\Traits\friendable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Cache;
 
 class User extends Authenticatable
 {
@@ -16,7 +17,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'pic', 'password', 'gender', 'slug'
+        'id','name', 'email', 'pic', 'password', 'gender', 'slug'
     ];
 
     /**
@@ -35,6 +36,10 @@ class User extends Authenticatable
     public function profile()
     {
         return $this->hasOne('App\profile');
+    }
+    public function isOnline()
+    {
+        return Cache::has('active-' . $this->id);
     }
   
 
